@@ -59,7 +59,6 @@ public class FollowActivity extends AppCompatActivity {
         }else {
             getFollowing(uname);
         }
-
 //        if (value.equalsIgnoreCase("following")){
 //            getFollowing(uname);
 //        }
