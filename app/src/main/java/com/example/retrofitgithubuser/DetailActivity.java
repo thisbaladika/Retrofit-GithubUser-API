@@ -1,6 +1,7 @@
 package com.example.retrofitgithubuser;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -8,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +25,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnTouch;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,9 +47,13 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.rvRepo)
     RecyclerView recyclerView;
 
+    @BindView(R.id.layout_follower)
+    LinearLayout layout_follower;
+
     String uname;
     private RepoAdapter adapter;
     private ProgressDialog progressDialog;
+    private String ApiKey = "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";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,23 +70,47 @@ public class DetailActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(uname);
 
-//        Toast.makeText(getApplicationContext(), ""+uname, Toast.LENGTH_LONG).show();
-
         getData();
         getRepo();
+    }
+
+    @OnTouch(R.id.layout_follower)
+    void cardFollower(){
+        String value = "follower";
+        detailClick(value);
+    }
+
+    @OnTouch(R.id.layout_following)
+    void cardFollowing(){
+        String value = "following";
+        detailClick(value);
+    }
+
+//    @OnTouch(R.id.layout_repo)
+//    void cardRepo(){
+//        String value = "";
+//        detailClick(value);
+//    }
+
+    private void detailClick(String value) {
+        if (!value.equalsIgnoreCase("")){
+            Intent intent = new Intent(DetailActivity.this, FollowActivity.class);
+            intent.putExtra("uname", uname);
+            intent.putExtra("value", value);
+            startActivity(intent);
+        }
     }
 
     private void getData() {
         ApiService service = UserModule.getRetrofit().create(ApiService.class);
 
-        Call<UserDetail> call = service.detailUser(uname);
+        Call<UserDetail> call = service.detailUser(ApiKey,uname);
         call.enqueue(new Callback<UserDetail>() {
             @Override
             public void onResponse(Call<UserDetail> call, Response<UserDetail> response) {
                 progressDialog.hide();
 
                 UserDetail userDetail = response.body();
-//                Toast.makeText(getApplicationContext(), ""+userDetail.getFollowers(), Toast.LENGTH_LONG).show();
                 txt_follower.setText(userDetail.getFollowers());
                 txt_following.setText(userDetail.getFollowing());
                 txt_repo.setText(userDetail.getPublicRepos());
@@ -102,16 +133,12 @@ public class DetailActivity extends AppCompatActivity {
 
     private void getRepo() {
         ApiService service = UserModule.getRetrofit().create(ApiService.class);
-        Call<List<UserRepo>> call = service.getRepo(uname);
+        Call<List<UserRepo>> call = service.getRepo(ApiKey,uname);
 
         call.enqueue(new Callback<List<UserRepo>>() {
             @Override
             public void onResponse(Call<List<UserRepo>> call, Response<List<UserRepo>> response) {
                 progressDialog.dismiss();
-//                List<UserRepo> userRepo = response.body();
-
-//                Toast.makeText(getApplicationContext(), "ini repo"+uname, Toast.LENGTH_LONG).show();
-
                 getAdapter(response.body());
             }
 

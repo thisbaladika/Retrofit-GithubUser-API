@@ -2,6 +2,7 @@ package com.example.retrofitgithubuser;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,8 +12,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +29,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTouch;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.main_search)
     EditText edt_search;
 
-
     List<UserSearchData> userDataEntityList;
     private UserAdapter adapter;
     private ProgressDialog progressDialog;
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
 
         edt_search.requestFocus();
         edt_search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -64,35 +69,11 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.pop_search, menu);
-        MenuItem item = menu.findItem(R.id.item_search);
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                progressDialog = new ProgressDialog(MainActivity.this);
-                progressDialog.setMessage("Loading..");
-                progressDialog.show();
-                getData(query);
-
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-
-
-                return false;
-            }
-        });
-        return true;
-    }
 
     private void getData(String newText) {
         ApiService service = UserModule.getRetrofit().create(ApiService.class);
